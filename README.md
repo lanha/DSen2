@@ -1,2 +1,5 @@
 # DSen2
-DeepSentinel2: Super-Resolution of Sentinel-2 Images: Learning a Globally Applicable Deep Neural Network
+Deep Sentinel-2
+
+## Model
+Model weights will be released on 31st March 2018.
