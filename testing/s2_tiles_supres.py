@@ -380,25 +380,6 @@ def write_band_data(data, description, shortname=None):
         result_dataset.GetRasterBand(bidx).WriteArray(data)
 
 
-# # 20m
-# sys.stdout.write("Writing")
-# if copy_original_bands:
-#     result_dataset = driver.Create(output_file, data20.shape[1], data20.shape[0],
-#                                    data20.shape[2] + sr20.shape[2], gdal.GDT_Float64)
-#     result_dataset.SetGeoTransform(ds20.GetGeoTransform())
-#     result_dataset.SetProjection(ds20.GetProjection())
-#     if validated_20m_bands:
-#         sys.stdout.write(" the original 20m bands and")
-#         for bi, bn in enumerate(validated_20m_bands):
-#             write_band_data(data20[:, :, bi], validated_descriptions[bn])
-# else:
-#     result_dataset = driver.Create(output_file, data10.shape[1], data10.shape[0], sr20.shape[2], gdal.GDT_Float64)
-#     result_dataset.SetGeoTransform(ds20.GetGeoTransform())
-#     result_dataset.SetProjection(ds20.GetProjection())
-# print(" the super-resolved bands in %s" % output_file)
-# for bi, bn in enumerate(validated_20m_bands):
-#     write_band_data(sr20[:, :, bi], "SR" + validated_descriptions[bn], "SR" + bn)
-
 if sr60 is not None:
     sr = np.concatenate((sr20, sr60), axis=2)
     validated_sr_bands = validated_20m_bands + validated_60m_bands
