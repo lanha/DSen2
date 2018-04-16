@@ -386,7 +386,7 @@ if sr60 is not None:
 else:
     sr = sr20
     validated_sr_bands = validated_20m_bands
-    
+
 if copy_original_bands:
     out_dims = data10.shape[2] + sr.shape[2]
 else:

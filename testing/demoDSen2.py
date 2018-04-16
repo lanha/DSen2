@@ -1,8 +1,11 @@
+from __future__ import absolute_import
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 from supres import DSen2_20, DSen2_60
-from imresize import imresize
+import sys
+sys.path.append('../')
+from utils.imresize import imresize
 
 
 DATA_PATH = '../data/'
@@ -82,7 +85,7 @@ if __name__ == '__main__':
     # Here using the very deep variable (VDSen2)
     print('New York')
     im10, im20, imGT = readh5('S2B_MSIL1C_20170928_T18TWL.mat', im60=False, imGT=True)
-    SR20 = DSen2_20(im10, im20, deep=True)
+    SR20 = DSen2_20(im10, im20, deep=False)
     # Evaluation against the ground truth on the 20m resolution bands (simulated)
     print('DSen2:')
     RMSE(SR20,imGT)
