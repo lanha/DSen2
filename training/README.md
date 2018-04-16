@@ -15,6 +15,7 @@ Moreover, use the switch ``--run_60`` to create patches for DSen2_60 (6x network
 3) Run `supres_train.py`. You can resume a model from previous weights with `--resume`. You can use the `--deep` switch to train a VDSen2 (very deep network), this applies whenever a very deep network is used.
 Caution: You must change the model number for every new run, otherwise it will overwrite previous runs.
 
+Note: The network was trained by loading all the data on a 64GB RAM. In case the training data don't fit in the RAM, a generator can be used.
 
 ## Testing
 
