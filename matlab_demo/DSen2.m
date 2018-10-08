@@ -6,7 +6,7 @@ function SR = DSen2(im10, im20, im60)
 % 
 % Inputs:
 %   im10 - The highest resolution bands in the following order:
-%               (B4, B3, B2, B8)
+%               (B2, B3, B4, B8)
 %               Dims: (x,y,4)
 %   im20 - The medium resolution bands in the following order:
 %               (B5, B6, B7, B8a, B11, B12)
