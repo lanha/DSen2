@@ -395,8 +395,14 @@ else:
 
 sys.stdout.write("Writing")
 result_dataset = driver.Create(output_file, data10.shape[1], data10.shape[0], out_dims, gdal.GDT_Float64)
-result_dataset.SetGeoTransform(ds10.GetGeoTransform())
+
+# Translate the image upper left corner. We multiply x10 to transform from pixel position in the 10m_band to meters.
+geot = list(ds10.GetGeoTransform())
+geot[0] += xmin * 10
+geot[3] -= ymin * 10
+result_dataset.SetGeoTransform(tuple(geot))
 result_dataset.SetProjection(ds10.GetProjection())
+
 if copy_original_bands:
     sys.stdout.write(" the original 10m bands and")
     # Write the original 10m bands
