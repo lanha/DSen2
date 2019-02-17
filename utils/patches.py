@@ -381,25 +381,25 @@ def recompose_images(a, border, size=None):
 
         # print('Patch has dimension {}'.format(patch_size))
         # print('Prediction has shape {}'.format(a.shape))
-        x_tiles = int(ceil(size[0]/float(patch_size)))
-        y_tiles = int(ceil(size[1]/float(patch_size)))
+        x_tiles = int(ceil(size[1]/float(patch_size)))
+        y_tiles = int(ceil(size[0]/float(patch_size)))
         # print('Tiles per image {} {}'.format(x_tiles, y_tiles))
 
         # Initialize image
         # print('Image size is: {}'.format(size))
-        images = np.zeros((a.shape[1], size[1], size[0])).astype(np.float32)
+        images = np.zeros((a.shape[1], size[0], size[1])).astype(np.float32)
 
         print(images.shape)
         current_patch = 0
         for y in range(0, y_tiles):
             ypoint = y * patch_size
-            if ypoint > size[1] - patch_size:
-                ypoint = size[1] - patch_size
+            if ypoint > size[0] - patch_size:
+                ypoint = size[0] - patch_size
             for x in range(0, x_tiles):
                 xpoint = x * patch_size
-                if xpoint > size[0] - patch_size:
-                    xpoint = size[0] - patch_size
-                images[:, ypoint:ypoint+patch_size, xpoint:xpoint+patch_size] = a[current_patch, :, border:a.shape[2]-border, border:a.shape[2]-border]
+                if xpoint > size[1] - patch_size:
+                    xpoint = size[1] - patch_size
+                images[:, ypoint:ypoint+patch_size, xpoint:xpoint+patch_size] = a[current_patch, :, border:a.shape[2]-border, border:a.shape[3]-border]
                 current_patch += 1
 
     return images.transpose((1, 2, 0))
