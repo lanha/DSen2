@@ -31,7 +31,7 @@ To also predict the lowest resolution bands (60m) use the `--run_60` option.
 
 ## MATLAB Demo
 
-The demo is also ported to MATLAB: `demoDSen2.m`. However, MATLAB 2017b or newer is needed to run. It utilizes the Neural Network toolbox that can be accelerated with the Parallel Computing Toolbox.
+The demo is also ported to MATLAB: `demoDSen2.m`. However, MATLAB 2018a or newer is needed to run. It utilizes the Neural Network toolbox that can be accelerated with the Parallel Computing Toolbox.
 
 ## Used Sentinel-2 tiles
 

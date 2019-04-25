@@ -1,17 +1,19 @@
 % ----------------------------------------------------------------------- %
 % DSen2: Deep Sentinel-2
 % 
-% Super-Resolution of Sentinel-2 Images: Learning a Globally Applicable
-% Deep Neural Network
+% Super-resolution of Sentinel-2 images: Learning a globally applicable
+% deep neural network
 % 
 % C. Lanaras, J. Bioucas-Dias, S. Galliani, E. Baltsavias, K. Schindler.
-% arXiv preprint arXiv:1803.04271
+% ISPRS Journal of Photogrammetry and Remote Sensing
+% Volume 146, Dec. 2018, Pages 305-319
+% https://doi.org/10.1016/j.isprsjprs.2018.09.018
 % 
 % ----------------------------------------------------------------------- %
 % 
 % DEMO
 %
-% This demo is only available with MATLAB 2017b or newer. You can speed up
+% This demo is only available with MATLAB 2018a or newer. You can speed up
 % the computation by using the Parallel Computing Toolbox with your GPU.
 % 
 % For computational efficiency only the DSen2 network is implemented (and

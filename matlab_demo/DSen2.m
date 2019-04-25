@@ -27,13 +27,15 @@ function SR = DSen2(im10, im20, im60)
 %   as it is sensible to the exact spectral response of each band.
 % 
 % Compatibility:
-%   In order to run this code you need MATLAB 2017b or newer with the
+%   In order to run this code you need MATLAB 2018a or newer with the
 %   Neural Network Toolbox.
 % 
 % If you use this code please cite:
 %   C. Lanaras, J. Bioucas-Dias, S. Galliani, E. Baltsavias, K. Schindler.
-%   Super-Resolution of Sentinel-2 Images: Learning a Globally Applicable
-%   Deep Neural Network. arXiv preprint arXiv:1803.04271, 2018.
+%   Super-resolution of Sentinel-2 images: Learning a globally applicable
+%   deep neural network. ISPRS Journal of Photogrammetry and Remote Sensing,
+%   Volume 146, Dec. 2018, Pages 305-319.
+%   https://doi.org/10.1016/j.isprsjprs.2018.09.018
 
 if nargin==2
     patchSize = 80;
