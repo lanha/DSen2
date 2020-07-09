@@ -17,7 +17,8 @@ disable=
     protected-access,
     redefined-outer-name,
     too-many-instance-attributes,
-    fixme
+    fixme,
+    wrong-import-position
 
 [FORMAT]
 max-line-length=120
