@@ -1,11 +1,13 @@
 from __future__ import division
+import os
+import sys
+import re
+from collections import defaultdict
+
 import argparse
 import numpy as np
-import os
-import re
-import sys
+
 from osgeo import gdal, osr
-from collections import defaultdict
 from supres import DSen2_20, DSen2_60
 
 # This code is adapted from this repository http://nicolas.brodu.net/code/superres and is distributed under the same
@@ -126,7 +128,7 @@ else:
     select_bands = "B2,B3,B4,B5,B6,B7,B8,B8A,B11,B12"
 
 # convert comma separated band list into a list
-select_bands = [x for x in re.split(",", select_bands)]
+select_bands = re.split(",", select_bands)
 
 if roi_lon_lat:
     roi_lon1, roi_lat1, roi_lon2, roi_lat2 = [
@@ -190,7 +192,7 @@ for (tmidx, (dsname, dsdesc)) in enumerate(tenMsets + unknownMsets):
         ct = osr.CoordinateTransformation(srsLatLon, srs)
 
         def to_xy(lon, lat):
-            (xp, yp, h) = ct.TransformPoint(lon, lat, 0.0)
+            (xp, yp, _) = ct.TransformPoint(lon, lat, 0.0)
             xp -= xoff
             yp -= yoff
             # matrix inversion
@@ -268,7 +270,7 @@ ds60 = gdal.Open(selected_60m_data_set[0])
 
 
 def validate_description(description):
-    m = re.match("(.*?), central wavelength (\d+) nm", description)
+    m = re.match(r"(.*?), central wavelength (\d+) nm", description)
     if m:
         return m.group(1) + " (" + m.group(2) + " nm)"
     # Some HDR restrictions... ENVI band names should not include commas
