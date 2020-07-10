@@ -1,11 +1,13 @@
 from __future__ import division
-import numpy as np
-import datetime
-import glob
-import time
-import argparse
 import os
+import glob
 import sys
+import datetime
+import time
+
+import argparse
+import numpy as np
+
 import matplotlib as mpl
 
 mpl.use("Agg")

@@ -5,11 +5,13 @@ import re
 from collections import defaultdict
 
 import argparse
+import json
+
 import numpy as np
+import imageio
+
 from osgeo import gdal
 
-import imageio
-import json
 
 sys.path.append("../")
 from utils.patches import (
@@ -98,9 +100,9 @@ def readS2fromFile(
             utm = dsdesc[dsdesc.find("UTM") :]
 
     # convert comma separated band list into a list
-    select_bands = [x for x in re.split(",", select_bands)]
+    select_bands = re.split(",", select_bands)
 
-    print("Selected UTM Zone:".format(utm))
+    print("Selected UTM Zone: %s" % utm)
     print(
         "Selected pixel region: xmin=%d, ymin=%d, xmax=%d, ymax=%d:"
         % (xmin, ymin, xmax, ymax)
@@ -140,7 +142,7 @@ def readS2fromFile(
     ds60 = gdal.Open(selected_60m_data_set[0])
 
     def validate_description(description):
-        m = re.match("(.*?), central wavelength (\d+) nm", description)
+        m = re.match(r"(.*?), central wavelength (\d+) nm", description)
         if m:
             return m.group(1) + " (" + m.group(2) + " nm)"
         # Some HDR restrictions... ENVI band names should not include commas

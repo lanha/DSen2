@@ -1,9 +1,11 @@
 from __future__ import absolute_import
+import sys
+
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 from supres import DSen2_20, DSen2_60
-import sys
+
 
 sys.path.append("../")
 from utils.imresize import imresize

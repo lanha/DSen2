@@ -1,5 +1,6 @@
+from math import ceil
+
 import numpy as np
-from math import ceil, floor
 
 # This code was cloned from https://github.com/fatheral/matlab_imresize
 # It is used to get the MATLAB bicubic upsampling.
@@ -25,7 +26,7 @@ def cubic(x):
     absx2 = np.multiply(absx, absx)
     absx3 = np.multiply(absx2, absx)
     f = np.multiply(1.5 * absx3 - 2.5 * absx2 + 1, absx <= 1) + np.multiply(
-        -0.5 * absx3 + 2.5 * absx2 - 4 * absx + 2, (1 < absx) & (absx <= 2)
+        -0.5 * absx3 + 2.5 * absx2 - 4 * absx + 2, (absx > 1) & (absx <= 2)
     )
     return f
 

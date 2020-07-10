@@ -1,11 +1,14 @@
 from __future__ import division
-import numpy as np
-from random import randrange
-from skimage.transform import resize
 import os
 import glob
 import json
 from math import ceil
+from random import randrange
+
+import numpy as np
+from skimage.transform import resize
+import skimage.measure
+from scipy.ndimage.filters import gaussian_filter
 
 
 def interp_patches(image_20, image_10_shape):
@@ -489,10 +492,6 @@ def OpenDataFilesTest(path, run_60, SCALE, true_scale=False):
 
 
 def downPixelAggr(img, SCALE=2):
-    from scipy import signal
-    import skimage.measure
-    from scipy.ndimage.filters import gaussian_filter
-
     if len(img.shape) == 2:
         img = np.expand_dims(img, axis=-1)
     img_blur = np.zeros(img.shape)
