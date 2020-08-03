@@ -118,7 +118,9 @@ def get_test_patches(dset_10, dset_20, patchSize=128, border=4, interp=True):
     return image_10, data20_interp
 
 
-def get_test_patches60(dset_10, dset_20, dset_60, patchSize=192, border=12, interp=True):
+def get_test_patches60(
+    dset_10, dset_20, dset_60, patchSize=192, border=12, interp=True
+):
 
     PATCH_SIZE_10 = (patchSize, patchSize)
     PATCH_SIZE_20 = [p // 2 for p in PATCH_SIZE_10]
