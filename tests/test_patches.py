@@ -21,12 +21,12 @@ def dset_60():
 
 
 def test_get_test_patches(dset_10, dset_20):
-    r = patches.get_test_patches(dset_10, dset_20)
+    r = patches.get_test_patches(dset_10, dset_20, 128, 8)
     assert r
 
 
 def test_get_test_patches60(dset_10, dset_20, dset_60):
-    r = patches.get_test_patches60(dset_10, dset_20, dset_60)
+    r = patches.get_test_patches60(dset_10, dset_20, dset_60, 192, 12)
     assert r
 
 
