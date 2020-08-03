@@ -1,8 +1,5 @@
 from __future__ import division
 
-# import numpy as np
-# import argparse
-# from skimage.transform import resize
 import sys
 
 sys.path.append("../")
@@ -14,7 +11,7 @@ SCALE = 2000
 MDL_PATH = "../models/"
 
 
-def DSen2_20(d10, d20, deep=False):
+def dsen2_20(d10, d20, deep=False):
     # Input to the funcion must be of shape:
     #     d10: [x,y,4]      (B2, B3, B4, B8)
     #     d20: [x/2,y/4,6]  (B5, B6, B7, B8a, B11, B12)
@@ -32,7 +29,7 @@ def DSen2_20(d10, d20, deep=False):
     return images
 
 
-def DSen2_60(d10, d20, d60, deep=False):
+def dsen2_60(d10, d20, d60, deep=False):
     # Input to the funcion must be of shape:
     #     d10: [x,y,4]      (B2, B3, B4, B8)
     #     d20: [x/2,y/4,6]  (B5, B6, B7, B8a, B11, B12)

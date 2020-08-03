@@ -4,7 +4,7 @@ import sys
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
-from supres import DSen2_20, DSen2_60
+from supres import dsen2_20, dsen2_60
 
 
 sys.path.append("../")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Siberia, same area of Fig. 8 in the paper
     print("Siberia")
     im10, im20, imGT = readh5("S2B_MSIL1C_20170725_T43WFQ.mat", imGT=True)
-    SR20 = DSen2_20(im10, im20)
+    SR20 = dsen2_20(im10, im20)
     # Evaluation against the ground truth on the 20m resolution bands (simulated)
     print("DSen2:")
     RMSE(SR20, imGT)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     im10, im20, im60, imGT = readh5(
         "S2A_MSIL1C_20171028_T34HCH.mat", im60=True, imGT=True
     )
-    SR60 = DSen2_60(im10, im20, im60)
+    SR60 = dsen2_60(im10, im20, im60)
     # Evaluation against the ground truth on the 60m resolution bands (simulated)
     print("DSen2:")
     RMSE(SR60, imGT)
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     # Here using the very deep variable (VDSen2)
     print("New York")
     im10, im20, imGT = readh5("S2B_MSIL1C_20170928_T18TWL.mat", im60=False, imGT=True)
-    SR20 = DSen2_20(im10, im20, deep=False)
+    SR20 = dsen2_20(im10, im20, deep=False)
     # Evaluation against the ground truth on the 20m resolution bands (simulated)
     print("DSen2:")
     RMSE(SR20, imGT)
@@ -103,8 +103,8 @@ if __name__ == "__main__":
     print("Malmo, no ground truth")
     im10, im20, im60 = readh5("S2A_MSIL1C_20170527_T33UUB.mat", im60=True, imGT=False)
 
-    SR20 = DSen2_20(im10, im20)
-    SR60 = DSen2_60(im10, im20, im60)
+    SR20 = dsen2_20(im10, im20)
+    SR60 = dsen2_60(im10, im20, im60)
 
     # No ground truth available, no simulation. Comparison to the low-res input
     fig = plt.figure(4)
@@ -130,8 +130,8 @@ if __name__ == "__main__":
     # Shark bay, Australia, same area of Fig. 10 (middle) in the paper
     print("Shark Bay, no ground truth")
     im10, im20, im60 = readh5("S2B_MSIL1C_20171022_T49JGM.mat", im60=True, imGT=False)
-    SR20 = DSen2_20(im10, im20)
-    SR60 = DSen2_60(im10, im20, im60)
+    SR20 = dsen2_20(im10, im20)
+    SR60 = dsen2_60(im10, im20, im60)
 
     # Stretching the image for better visualization
     for i in range(SR60.shape[2]):
