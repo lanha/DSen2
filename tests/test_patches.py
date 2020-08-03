@@ -7,23 +7,22 @@ from utils import patches
 
 @pytest.fixture()
 def dset_10():
-    return np.random.randint(low=0, high=8, size=(4, 10980, 10980), dtype=np.int8)
+    return np.ones((10980, 10980, 4))
 
 
 @pytest.fixture()
 def dset_20():
-    return np.random.randint(low=0, high=8, size=(5, 5490, 5490), dtype=np.int8)
+    return np.ones((5490, 5490, 5))
 
 
 @pytest.fixture()
 def dset_60():
-    return np.random.randint(low=0, high=8, size=(3, 1830, 1830), dtype=np.int8)
+    return np.ones((1830, 1830, 3))
 
 
 def test_get_test_patches(dset_10, dset_20):
     r = patches.get_test_patches(dset_10, dset_20)
-    print(r)
-    assert False
+    assert r
 
 
 def test_get_test_patches60(dset_10, dset_20, dset_60):
