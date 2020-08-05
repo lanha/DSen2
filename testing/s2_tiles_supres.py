@@ -38,7 +38,7 @@ def save_result(
 
 
 # pylint: disable-msg=too-many-arguments
-def update(data, size_10m: Tuple, model_output: np.ndarray, xmi: int, ymi: int):
+def update(pr_10m, size_10m: Tuple, model_output: np.ndarray, xmi: int, ymi: int):
     """
     This method creates the proper georeferencing for the output image.
     :param data: The raster file for 10m resolution.
@@ -47,16 +47,14 @@ def update(data, size_10m: Tuple, model_output: np.ndarray, xmi: int, ymi: int):
     # Here based on the params.json file, the output image dimension will be calculated.
     out_dims = model_output.shape[2]
 
-    with rasterio.open(data) as d_s:
-        p_r = d_s.profile
-    new_transform = p_r["transform"] * A.translation(xmi, ymi)
-    p_r.update(dtype=rasterio.float32)
-    p_r.update(driver="GTiff")
-    p_r.update(width=size_10m[1])
-    p_r.update(height=size_10m[0])
-    p_r.update(count=out_dims)
-    p_r.update(transform=new_transform)
-    return p_r
+    new_transform = pr_10m["transform"] * A.translation(xmi, ymi)
+    pr_10m.update(dtype=rasterio.float32)
+    pr_10m.update(driver="GTiff")
+    pr_10m.update(width=size_10m[1])
+    pr_10m.update(height=size_10m[0])
+    pr_10m.update(count=out_dims)
+    pr_10m.update(transform=new_transform)
+    return pr_10m
 
 
 class Superresolution(DATA_UTILS):
@@ -68,6 +66,7 @@ class Superresolution(DATA_UTILS):
 
         super().__init__(data_file_path)
 
+    # pylint: disable=attribute-defined-outside-init
     def start(self):
         data_list = self.get_data()
 
@@ -93,17 +92,24 @@ class Superresolution(DATA_UTILS):
         for dsdesc in data_list:
             if "10m" in dsdesc:
                 LOGGER.info("Selected 10m bands:")
-                validated_10m_bands, validated_10m_indices, dic_10m = self.validate(
-                    dsdesc
-                )
+                (
+                    self.validated_10m_bands,
+                    validated_10m_indices,
+                    dic_10m,
+                ) = self.validate(dsdesc)
                 data10 = self.data_final(
                     dsdesc, validated_10m_indices, xmin, ymin, xmax, ymax, 1
                 )
+                with rasterio.open(dsdesc) as d_s:
+                    pr_10m = d_s.profile
+
             if "20m" in dsdesc:
                 LOGGER.info("Selected 20m bands:")
-                validated_20m_bands, validated_20m_indices, dic_20m = self.validate(
-                    dsdesc
-                )
+                (
+                    self.validated_20m_bands,
+                    validated_20m_indices,
+                    dic_20m,
+                ) = self.validate(dsdesc)
                 data20 = self.data_final(
                     dsdesc,
                     validated_20m_indices,
@@ -115,9 +121,11 @@ class Superresolution(DATA_UTILS):
                 )
             if "60m" in dsdesc:
                 LOGGER.info("Selected 60m bands:")
-                validated_60m_bands, validated_60m_indices, dic_60m = self.validate(
-                    dsdesc
-                )
+                (
+                    self.validated_60m_bands,
+                    validated_60m_indices,
+                    dic_60m,
+                ) = self.validate(dsdesc)
                 data60 = self.data_final(
                     dsdesc,
                     validated_60m_indices,
@@ -128,9 +136,16 @@ class Superresolution(DATA_UTILS):
                     1 // 6,
                 )
 
-        validated_descriptions_all = {**dic_10m, **dic_20m, **dic_60m}
+        self.validated_descriptions_all = {**dic_10m, **dic_20m, **dic_60m}
+        return data10, data20, data60, [xmin, ymin, xmax, ymax], pr_10m
 
-        if validated_60m_bands and validated_20m_bands and validated_10m_bands:
+    def inference(self, data10, data20, data60, coord, pr_10m):
+
+        if (
+            self.validated_60m_bands
+            and self.validated_20m_bands
+            and self.validated_10m_bands
+        ):
             LOGGER.info("Super-resolving the 60m data into 10m bands")
             sr60 = dsen2_60(data10, data20, data60, deep=False)
             LOGGER.info("Super-resolving the 20m data into 10m bands")
@@ -142,15 +157,17 @@ class Superresolution(DATA_UTILS):
         if self.copy_original_bands:
             sr_final = np.concatenate((data10, sr20, sr60), axis=2)
             validated_sr_final_bands = (
-                validated_10m_bands + validated_20m_bands + validated_60m_bands
+                self.validated_10m_bands
+                + self.validated_20m_bands
+                + self.validated_60m_bands
             )
         else:
             sr_final = np.concatenate((sr20, sr60), axis=2)
-            validated_sr_final_bands = validated_20m_bands + validated_60m_bands
+            validated_sr_final_bands = (
+                self.validated_20m_bands + self.validated_60m_bands
+            )
 
-        for dsdesc in data_list:
-            if "10m" in dsdesc:
-                p_r = update(dsdesc, data10.shape, sr_final, xmin, ymin)
+        pr_10m_updated = update(pr_10m, data10.shape, sr_final, coord[0], coord[1])
 
         path_to_output_img = self.data_name.split(".")[0] + "_superresolution.tif"
         filename = os.path.join(self.output_dir, path_to_output_img)
@@ -159,13 +176,17 @@ class Superresolution(DATA_UTILS):
         save_result(
             sr_final,
             validated_sr_final_bands,
-            validated_descriptions_all,
-            p_r,
+            self.validated_descriptions_all,
+            pr_10m_updated,
             filename,
         )
         del sr_final
         LOGGER.info("This is for releasing memory: %s", gc.collect())
         LOGGER.info("Writing the super-resolved bands is finished.")
+
+    def process(self):
+        data10, data20, data60, coord, pr_10m = self.start()
+        self.inference(data10, data20, data60, coord, pr_10m)
 
 
 if __name__ == "__main__":
@@ -200,4 +221,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     Superresolution(
         args.data_file_path, args.clip_to_aoi, args.copy_original_bands, args.output_dir
-    ).start()
+    ).process()

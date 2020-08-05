@@ -6,7 +6,7 @@ import keras.backend as K
 K.set_image_data_format("channels_first")
 
 
-def resBlock(x, channels, kernel_size=[3, 3], scale=0.1):
+def resBlock(x, channels, kernel_size, scale=0.1):
     tmp = Conv2D(
         channels, kernel_size, kernel_initializer="he_uniform", padding="same"
     )(x)
@@ -38,14 +38,13 @@ def s2model(input_shape, num_layers=32, feature_size=256):
         padding="same",
     )(x)
 
-    for i in range(num_layers):
-        x = resBlock(x, feature_size)
+    for _ in range(num_layers):
+        x = resBlock(x, feature_size, [3, 3])
 
     # One more convolution, and then we add the output of our first conv layer
     x = Conv2D(
         input_shape[-1][0], (3, 3), kernel_initializer="he_uniform", padding="same"
     )(x)
-    # x = Dropout(0.3)(x)
     if len(input_shape) == 3:
         x = Add()([x, input60])
         model = Model(inputs=[input10, input20, input60], outputs=x)

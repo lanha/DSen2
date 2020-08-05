@@ -1,14 +1,11 @@
 from __future__ import division
 
-import sys
-
-sys.path.append("../")
 from utils.DSen2Net import s2model
 from utils.patches import get_test_patches, get_test_patches60, recompose_images
 
 
 SCALE = 2000
-MDL_PATH = "../models/"
+MDL_PATH = "./models/"
 
 
 def dsen2_20(d10, d20, deep=False):
