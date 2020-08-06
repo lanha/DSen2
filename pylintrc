@@ -18,7 +18,9 @@ disable=
     redefined-outer-name,
     too-many-instance-attributes,
     fixme,
-    wrong-import-position
+    wrong-import-position,
+    logging-fstring-interpolation,
+    logging-format-interpolation
 
 [FORMAT]
 max-line-length=120
