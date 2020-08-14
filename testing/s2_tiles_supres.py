@@ -63,6 +63,7 @@ class Superresolution(DATA_UTILS):
         self.clip_to_aoi = clip_to_aoi
         self.copy_original_bands = copy_original_bands
         self.output_dir = output_dir
+        self.data_name = os.path.basename(data_file_path)
 
         super().__init__(data_file_path)
 

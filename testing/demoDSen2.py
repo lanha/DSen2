@@ -13,7 +13,7 @@ from utils.imresize import imresize
 
 DATA_PATH = "../data/"
 
-
+# pylint: disable=unbalanced-tuple-unpacking
 def readh5(fname, im60=False, imGT=False):
     with h5py.File(DATA_PATH + fname, "r") as f:
         d10 = f["im10"][()].transpose()

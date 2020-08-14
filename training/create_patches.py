@@ -7,10 +7,9 @@ import json
 from typing import Tuple
 import numpy as np
 
+sys.path.append("..")
+
 from utils.data_utils import DATA_UTILS, get_logger
-
-
-sys.path.append("../")
 from utils.patches import (
     downPixelAggr,
     save_test_patches,
@@ -22,6 +21,58 @@ from utils.patches import (
 LOGGER = get_logger(__name__)
 
 
+def parser_common(parser):
+    parser.add_argument(
+        "--test_data",
+        default=False,
+        action="store_true",
+        help="Store test patches in a separate dir.",
+    )
+    parser.add_argument(
+        "--rgb_images",
+        default=False,
+        action="store_true",
+        help=(
+            "If set, write PNG images for the original and the superresolved bands,"
+            " together with a composite rgb image (first three 10m bands), all with a "
+            "quick and dirty clipping to 99%% of the original bands dynamic range and "
+            "a quantization of the values to 256 levels."
+        ),
+    )
+    parser.add_argument(
+        "--save_prefix",
+        default="../data/",
+        help=(
+            "If set, speficies the name of a prefix for all output files. "
+            "Use a trailing / to save into a directory. The default of no prefix will "
+            "save into the current directory. Example: --save_prefix result/"
+        ),
+    )
+    parser.add_argument(
+        "--run_60",
+        default=False,
+        action="store_true",
+        help="If set, it will create patches also from the 60m channels.",
+    )
+    parser.add_argument(
+        "--true_data",
+        default=False,
+        action="store_true",
+        help=(
+            "If set, it will create patches for S2 without GT. This option is not "
+            "really useful here, please check the testing folder for predicting S2 images."
+        ),
+    )
+    parser.add_argument(
+        "--train_data",
+        default=False,
+        action="store_true",
+        help="Store train patches in a separate dir",
+    )
+    return parser
+
+
+# pylint: disable=unbalanced-tuple-unpacking
 class readS2fromFile(DATA_UTILS):
     def __init__(
         self,
@@ -41,8 +92,8 @@ class readS2fromFile(DATA_UTILS):
         self.rgb_images = rgb_images
         self.run_60 = run_60
         self.true_data = true_data
-        self.test_data = test_data
         self.train_data = train_data
+        self.data_name = os.path.basename(data_file_path)
 
         super().__init__(data_file_path)
 
@@ -200,7 +251,7 @@ class readS2fromFile(DATA_UTILS):
             self.save_band(
                 self.save_prefix,
                 data10_lr[:, :, 0:3],
-                "/test/" + self.data_name + "/RGB",
+                "test/" + self.data_name + "/RGB",
             )
         np.save(out_per_image + "no_tiling/" + "data10", data10_lr.astype(np.float32))
         np.save(out_per_image + "no_tiling/" + "data20", data20_lr.astype(np.float32))
@@ -230,9 +281,8 @@ class readS2fromFile(DATA_UTILS):
         if not os.path.isdir(out_per_image):
             os.mkdir(out_per_image)
 
-        LOGGER.info(
-            f"Writing files for testing to:{out_per_image}"
-        )  # pylint: disable=logging-fstring-interpolation
+        # pylint: disable=logging-fstring-interpolation
+        LOGGER.info(f"Writing files for testing to:{out_per_image}")
         save_test_patches60(
             data10, data20, data60, out_per_image, patchSize=384, border=12
         )
@@ -290,66 +340,12 @@ if __name__ == "__main__":
             " or the S2A[...].xml file in a SAFE directory extracted from that ZIP."
         ),
     )
-    parser.add_argument(
-        "--clip_to_aoi",
-        default="",
-        help=(
-            "Sets the region of interest to extract as pixels locations on the 10m"
-            'bands. Use this syntax: x_1,y_1,x_2,y_2. E.g. --roi_x_y "2000,2000,3200,3200"'
-        ),
-    )
-    parser.add_argument(
-        "--test_data",
-        default=False,
-        action="store_true",
-        help="Store test patches in a separate dir.",
-    )
-    parser.add_argument(
-        "--rgb_images",
-        default=False,
-        action="store_true",
-        help=(
-            "If set, write PNG images for the original and the superresolved bands,"
-            " together with a composite rgb image (first three 10m bands), all with a "
-            "quick and dirty clipping to 99%% of the original bands dynamic range and "
-            "a quantization of the values to 256 levels."
-        ),
-    )
-    parser.add_argument(
-        "--save_prefix",
-        default="../data/",
-        help=(
-            "If set, speficies the name of a prefix for all output files. "
-            "Use a trailing / to save into a directory. The default of no prefix will "
-            "save into the current directory. Example: --save_prefix result/"
-        ),
-    )
-    parser.add_argument(
-        "--run_60",
-        default=False,
-        action="store_true",
-        help="If set, it will create patches also from the 60m channels.",
-    )
-    parser.add_argument(
-        "--true_data",
-        default=False,
-        action="store_true",
-        help=(
-            "If set, it will create patches for S2 without GT. This option is not "
-            "really useful here, please check the testing folder for predicting S2 images."
-        ),
-    )
-    parser.add_argument(
-        "--train_data",
-        default=False,
-        action="store_true",
-        help="Store train patches in a separate dir",
-    )
+    parser = parser_common(parser)
 
     args = parser.parse_args()
 
     LOGGER.info(
-        f"I will proceed with file {args.data_file}"
+        f"I will proceed with file {args.data_file_path}"
     )  # pylint: disable=logging-fstring-interpolation
     readS2fromFile(
         args.data_file_path,

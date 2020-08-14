@@ -510,9 +510,13 @@ def downPixelAggr(img: np.ndarray, SCALE: int = 2) -> np.ndarray:
     img_lr = np.zeros(new_dims[0:2] + (img.shape[-1],))
     # Iterate through all the image channels with avg pooling (pixel aggregation)
     for i in range(0, img.shape[2]):
-        img_lr[:, :, i] = skimage.measure.block_reduce(
+        reduced = skimage.measure.block_reduce(
             img_blur[:, :, i], (SCALE, SCALE), np.mean
         )
+        img_lr_shape = img_lr[:, :, i].shape
+        if reduced.shape != img_lr_shape:
+            reduced = reduced[: img_lr_shape[0], : img_lr_shape[1]]
+        img_lr[:, :, i] = reduced
 
     return np.squeeze(img_lr)
 

@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 mpl.use("Agg")
 from keras.optimizers import Nadam
@@ -40,6 +41,11 @@ class PlotLosses(Callback):
     def __init__(self, model_nr, lr):
         self.model_nr = model_nr
         self.lr = lr
+        self.losses = []
+        self.val_losses = []
+        self.i = 0
+        self.x = []
+        self.filename = out_path + self.model_nr + "_lr_{:.1e}.txt".format(self.lr)
 
     def on_train_begin(self, logs=None):
         self.losses = []
@@ -50,7 +56,6 @@ class PlotLosses(Callback):
         open(self.filename, "w").close()
 
     def on_epoch_end(self, epoch, logs=None):
-        import matplotlib.pyplot as plt
 
         plt.ioff()
 
@@ -61,8 +66,8 @@ class PlotLosses(Callback):
         self.x.append(self.i)
         self.i += 1
         try:
-            with open(self.filename, "a") as self.f:
-                self.f.write(
+            with open(self.filename, "a") as f:
+                f.write(
                     "Finished epoch {:5d}: loss {:.3e}, valid: {:.3e}, lr: {:.1e}\n".format(
                         epoch, logs.get("loss"), logs.get("val_loss"), lr
                     )
@@ -141,9 +146,9 @@ if __name__ == "__main__":
 
     # input_shape = ((4,32,32),(6,16,16))
     if args.run_60:
-        input_shape = ((4, None, None), (6, None, None), (2, None, None))
+        input_shape = ((4, None, None), (6, None, None), (2, None, None))  # type: ignore
     else:
-        input_shape = ((4, None, None), (6, None, None))
+        input_shape = ((4, None, None), (6, None, None))  # type: ignore
     # create model
     if args.deep:
         model = s2model(input_shape, num_layers=32, feature_size=256)

@@ -58,19 +58,11 @@ class DATA_UTILS:
         This method returns the raster data set of original image for
         all the available resolutions.
         """
-        # data_file_path is the path to the SAFE file.
-        if self.data_file_path.endswith("/"):
-            tmp = os.path.split(self.data_file_path)[0]
-            self.data_name = os.path.split(tmp)[1]
-        else:
-            self.data_name = os.path.split(self.data_file_path)[1]
-
-        data_path = ""
         data_folder = "MTD*.xml"
-        for file in glob.iglob(
-            os.path.join(self.data_name, data_folder), recursive=True,
-        ):
+        for file in glob.iglob(os.path.join(self.data_file_path, data_folder)):
             data_path = file
+
+        LOGGER.info(f"Data path is {data_path}")
 
         raster_data = rasterio.open(data_path)
         datasets = raster_data.subdatasets

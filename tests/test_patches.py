@@ -130,6 +130,10 @@ def test_downPixelAggr(dset_10, scale_20):
     r = patches.downPixelAggr(dset_10, scale_20)
     assert r.shape == (5490, 5490, 4)
 
+    dset_20_w = np.ones((5489, 5489, 6))
+    r = patches.downPixelAggr(dset_20_w, scale_20)
+    assert r.shape == (2744, 2744, 6)
+
 
 def test_recompose_images(dset_10, dset_20):
     p = patches.get_test_patches(dset_10, dset_20, 128, 8)
