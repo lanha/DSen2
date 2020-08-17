@@ -21,8 +21,6 @@ sys.path.append("../")
 from utils.patches import recompose_images, OpenDataFilesTest, OpenDataFiles
 from utils.DSen2Net import s2model
 
-K.set_image_data_format("channels_first")
-
 # Define file prefix for new training, must be 7 characters of this form:
 model_nr = "s2_038_"
 SCALE = 2000
