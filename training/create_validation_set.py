@@ -10,6 +10,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Create train validation index split file")
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
     args = parser.parse_args()
+    return args
 
 def main(args):
     # The `val_index.npy` must be created every time the number of training patches changes. It defines (and keeps set)
