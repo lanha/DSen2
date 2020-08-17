@@ -19,7 +19,7 @@ def main(args):
 
     # Size: number of S2 tiles (times) patches per tile
     n_scenes = len([
-        os.path.basename(x) for x in sorted(glob.glob(path + folder + "*SAFE"))
+        os.path.basename(x) for x in sorted(glob.glob(args.path + "*SAFE"))
     ])
     size = n_scenes * 8000
     ratio = 0.1
