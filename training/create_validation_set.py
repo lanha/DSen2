@@ -1,27 +1,41 @@
 from random import randrange
 import numpy as np
 
-# The `val_index.npy` must be created every time the number of training patches changes. It defines (and keeps set)
-# which of the patches will be used for validation.
+import argparse
 
-# This file must be changed if the DSen2_60 net is trained! (change the `path` and size of patches)
+def get_args():
+    parser = argparse.ArgumentParser(description="Create train validation index split file")
+    parser.add_argument("--path", help="Path of data. Only relevant if set.")
+    args = parser.parse_args()
 
-# Size: number of S2 tiles (times) patches per tile
-size = 45 * 8000
-ratio = 0.1
-nb = int(size * ratio)
+def main(args):
+    # The `val_index.npy` must be created every time the number of training patches changes. It defines (and keeps set)
+    # which of the patches will be used for validation.
 
-index = np.zeros(size).astype(np.bool)
-i = 0
-while np.sum(index.astype(np.int)) < nb:
-    x = randrange(0, size)
-    index[x] = True
-    i += 1
+    # This file must be changed if the DSen2_60 net is trained! (change the `path` and size of patches)
 
-path = "../data/train/"
-np.save(path + "val_index.npy", index)
+    # Size: number of S2 tiles (times) patches per tile
+    n_scenes = len([
+        os.path.basename(x) for x in sorted(glob.glob(path + folder + "*SAFE"))
+    ])
+    size = n_scenes * 8000
+    ratio = 0.1
+    nb = int(size * ratio)
 
-print("Full no of samples: {}".format(size))
-print("Validation samples: {}".format(np.sum(index.astype(np.int))))
+    index = np.zeros(size).astype(np.bool)
+    i = 0
+    while np.sum(index.astype(np.int)) < nb:
+        x = randrange(0, size)
+        index[x] = True
+        i += 1
 
-print("Number of iterations: {}".format(i))
+    np.save(args.path + "val_index.npy", index)
+
+    print("Full no of samples: {}".format(size))
+    print("Validation samples: {}".format(np.sum(index.astype(np.int))))
+
+    print("Number of iterations: {}".format(i))
+
+if __name__ == "__main__":
+    args = get_args()
+    main(args)
