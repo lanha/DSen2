@@ -1,7 +1,6 @@
 from __future__ import division
 from keras.models import Model, Input
 from keras.layers import Conv2D, Concatenate, Activation, Lambda, Add
-import keras.backend as K
 
 
 def resBlock(x, channels, kernel_size, scale=0.1):
