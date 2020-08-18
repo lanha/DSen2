@@ -10,6 +10,7 @@ MDL_PATH = "./models/"
 
 STRATEGY = tf.distribute.MirroredStrategy()
 
+
 def dsen2_20(d10, d20, deep=False):
     # Input to the funcion must be of shape:
     #     d10: [x,y,4]      (B2, B3, B4, B8)
