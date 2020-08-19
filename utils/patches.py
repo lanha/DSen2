@@ -419,10 +419,7 @@ def OpenDataFiles(
     path: str, run_60: bool, SCALE: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """From path with train patches, return numpy array with train and val patches."""
-    if run_60:
-        train_path = path + "train60/"
-    else:
-        train_path = path + "train/"
+    train_path = path
 
     # Create list from path
     fileList = [os.path.basename(x) for x in sorted(glob.glob(train_path + "*SAFE"))]

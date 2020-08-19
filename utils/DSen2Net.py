@@ -1,18 +1,23 @@
 from __future__ import division
 from keras.models import Model, Input
 from keras.layers import Conv2D, Concatenate, Activation, Lambda, Add
-import keras.backend as K
-
-K.set_image_data_format("channels_first")
 
 
 def resBlock(x, channels, kernel_size, scale=0.1):
     tmp = Conv2D(
-        channels, kernel_size, kernel_initializer="he_uniform", padding="same"
+        channels,
+        kernel_size,
+        data_format="channels_first",
+        kernel_initializer="he_uniform",
+        padding="same",
     )(x)
     tmp = Activation("relu")(tmp)
     tmp = Conv2D(
-        channels, kernel_size, kernel_initializer="he_uniform", padding="same"
+        channels,
+        kernel_size,
+        data_format="channels_first",
+        kernel_initializer="he_uniform",
+        padding="same",
     )(tmp)
     tmp = Lambda(lambda x: x * scale)(tmp)
 
@@ -33,6 +38,7 @@ def s2model(input_shape, num_layers=32, feature_size=256):
     x = Conv2D(
         feature_size,
         (3, 3),
+        data_format="channels_first",
         kernel_initializer="he_uniform",
         activation="relu",
         padding="same",
@@ -43,7 +49,11 @@ def s2model(input_shape, num_layers=32, feature_size=256):
 
     # One more convolution, and then we add the output of our first conv layer
     x = Conv2D(
-        input_shape[-1][0], (3, 3), kernel_initializer="he_uniform", padding="same"
+        input_shape[-1][0],
+        (3, 3),
+        data_format="channels_first",
+        kernel_initializer="he_uniform",
+        padding="same",
     )(x)
     if len(input_shape) == 3:
         x = Add()([x, input60])

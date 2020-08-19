@@ -6,6 +6,8 @@ import rasterio
 from rasterio import Affine
 from rasterio.crs import CRS
 
+import tensorflow as tf
+
 from blockutils.common import ensure_data_directories_exist
 from context import Superresolution
 
@@ -57,6 +59,10 @@ def test_start(fixture_superresolution_clip, monkeypatch):
     }
 
 
+@pytest.mark.skipif(
+    len(tf.config.list_physical_devices("GPU")) == 0,
+    reason="Conv2D op requires GPU for channels first configuration.",
+)
 def test_inference(fixture_superresolution_clip):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     fixture_superresolution_clip.validated_10m_bands = ["B4", "B3", "B2", "B8"]

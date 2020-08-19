@@ -12,6 +12,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 mpl.use("Agg")
+import tensorflow as tf
 from keras.optimizers import Nadam
 from keras.callbacks import ModelCheckpoint, Callback, ReduceLROnPlateau
 from keras.utils import plot_model
@@ -20,8 +21,6 @@ import keras.backend as K
 sys.path.append("../")
 from utils.patches import recompose_images, OpenDataFilesTest, OpenDataFiles
 from utils.DSen2Net import s2model
-
-K.set_image_data_format("channels_first")
 
 # Define file prefix for new training, must be 7 characters of this form:
 model_nr = "s2_038_"
@@ -35,6 +34,8 @@ if not os.path.isdir(path):
 out_path = "../data/network_data/"
 if not os.path.isdir(out_path):
     os.mkdir(out_path)
+
+STRATEGY = tf.distribute.MirroredStrategy()
 
 
 class PlotLosses(Callback):
@@ -144,29 +145,32 @@ if __name__ == "__main__":
     if args.path is not None:
         path = args.path
 
-    # input_shape = ((4,32,32),(6,16,16))
-    if args.run_60:
-        input_shape = ((4, None, None), (6, None, None), (2, None, None))  # type: ignore
-    else:
-        input_shape = ((4, None, None), (6, None, None))  # type: ignore
-    # create model
-    if args.deep:
-        model = s2model(input_shape, num_layers=32, feature_size=256)
-        batch_size = 8
-    else:
-        model = s2model(input_shape, num_layers=6, feature_size=128)
-        batch_size = 128
-    print("Symbolic Model Created.")
+    with STRATEGY.scope():
+        # input_shape = ((4,32,32),(6,16,16))
+        if args.run_60:
+            input_shape = ((4, None, None), (6, None, None), (2, None, None))  # type: ignore
+        else:
+            input_shape = ((4, None, None), (6, None, None))  # type: ignore
+        # create model
+        if args.deep:
+            model = s2model(input_shape, num_layers=32, feature_size=256)
+            batch_size = 8
+        else:
+            model = s2model(input_shape, num_layers=6, feature_size=128)
+            batch_size = 128
+        print("Symbolic Model Created.")
 
-    nadam = Nadam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-8, schedule_decay=0.004)
-    # clipvalue=0.000005)
+        nadam = Nadam(
+            lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-8, schedule_decay=0.004
+        )
+        # clipvalue=0.000005)
 
-    model.compile(
-        optimizer=nadam, loss="mean_absolute_error", metrics=["mean_squared_error"]
-    )
-    print("Model compiled.")
-    model.count_params()
-    # model.summary()
+        model.compile(
+            optimizer=nadam, loss="mean_absolute_error", metrics=["mean_squared_error"]
+        )
+        print("Model compiled.")
+        model.count_params()
+        # model.summary()
 
     if args.predict_file:
         if args.true:
