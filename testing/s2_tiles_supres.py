@@ -148,9 +148,9 @@ class Superresolution(DATA_UTILS):
             and self.validated_10m_bands
         ):
             LOGGER.info("Super-resolving the 60m data into 10m bands")
-            sr60 = dsen2_60(data10, data20, data60, deep=False)
+            sr60 = dsen2_60(data10, data20, data60)
             LOGGER.info("Super-resolving the 20m data into 10m bands")
-            sr20 = dsen2_20(data10, data20, deep=False)
+            sr20 = dsen2_20(data10, data20)
         else:
             LOGGER.info("No super-resolution performed, exiting")
             sys.exit(0)

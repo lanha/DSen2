@@ -90,7 +90,7 @@ if __name__ == "__main__":
     # Here using the very deep variable (VDSen2)
     print("New York")
     im10, im20, imGT = readh5("S2B_MSIL1C_20170928_T18TWL.mat", im60=False, imGT=True)
-    SR20 = dsen2_20(im10, im20, deep=False)
+    SR20 = dsen2_20(im10, im20)
     # Evaluation against the ground truth on the 20m resolution bands (simulated)
     print("DSen2:")
     RMSE(SR20, imGT)
