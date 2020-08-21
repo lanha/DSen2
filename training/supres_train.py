@@ -20,7 +20,7 @@ import keras.backend as K
 
 sys.path.append("../")
 from utils.patches import recompose_images, OpenDataFilesTest, OpenDataFiles
-from utils.DSen2Net import s2model
+from utils.DSen2Net import s2model, aesrmodel
 
 # Define file prefix for new training, must be 7 characters of this form:
 model_nr = "s2_038_"
@@ -139,6 +139,9 @@ if __name__ == "__main__":
         help="Whether to run a 60->10m network. Default 20->10m.",
     )
     parser.add_argument("--deep", action="store_true", help=".")
+    parser.add_argument(
+        "--aesr", action="store_true", help="Use AutoEnconder SR network"
+    )
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
     args = parser.parse_args()
 
@@ -152,12 +155,16 @@ if __name__ == "__main__":
         else:
             input_shape = ((4, None, None), (6, None, None))  # type: ignore
         # create model
-        if args.deep:
-            model = s2model(input_shape, num_layers=32, feature_size=256)
-            batch_size = 8
-        else:
-            model = s2model(input_shape, num_layers=6, feature_size=128)
+        if args.aesr:
+            model = aesrmodel(input_shape)
             batch_size = 128
+        else:
+            if args.deep:
+                model = s2model(input_shape, num_layers=32, feature_size=256)
+                batch_size = 8
+            else:
+                model = s2model(input_shape, num_layers=6, feature_size=128)
+                batch_size = 128
         print("Symbolic Model Created.")
 
         nadam = Nadam(

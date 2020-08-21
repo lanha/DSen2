@@ -11,6 +11,7 @@ def get_args():
         description="Create train validation index split file"
     )
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
+    parser.add_argument("--run_60", action="store_true", help="Generate val_index for 60m patches.")
     args = parser.parse_args()
     return args
 
@@ -25,7 +26,10 @@ def main(args):
     n_scenes = len(
         [os.path.basename(x) for x in sorted(glob.glob(args.path + "*SAFE"))]
     )
-    size = n_scenes * 8000
+    n_patches = 8000
+    if args.run_60:
+        n_patches = 500
+    size = n_scenes * n_patches
     ratio = 0.1
     nb = int(size * ratio)
 

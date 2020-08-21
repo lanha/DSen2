@@ -16,3 +16,4 @@ sys.path.insert(
 from data_utils import DATA_UTILS, get_logger
 from s2_tiles_supres import Superresolution
 import patches
+import DSen2Net
