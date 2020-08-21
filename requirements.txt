@@ -8,3 +8,4 @@ pyproj
 matplotlib
 pydot
 up42-blockutils
+image-similarity-measures
