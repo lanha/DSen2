@@ -47,11 +47,18 @@ def get_patches(
         np.float32
     )
 
-    # if height and width are divisible by patch size - border * 2,
+    # if height and width are divisible by patch size - border * 2, or if
+    # range_i \and range_j are smaller than size
     # add one extra patch at the end of the image
-    if np.mod(dset.shape[0] - 2 * border, patch_size - 2 * border) != 0:
+    if (
+        np.mod(dset.shape[0] - 2 * border, patch_size - 2 * border) != 0
+        or dset.shape[0] - 2 * border / patch_size - 2 * border > patches_along_i
+    ):
         range_i = np.append(range_i, (dset.shape[0] - patch_size))
-    if np.mod(dset.shape[1] - 2 * border, patch_size - 2 * border) != 0:
+    if (
+        np.mod(dset.shape[1] - 2 * border, patch_size - 2 * border) != 0
+        or dset.shape[1] - 2 * border / patch_size - 2 * border > patches_along_j
+    ):
         range_j = np.append(range_j, (dset.shape[1] - patch_size))
 
     patch_count = 0
