@@ -99,7 +99,7 @@ class Superresolution(DATA_UTILS):
                     dic_10m,
                 ) = self.validate(dsdesc)
                 data10 = self.data_final(
-                    dsdesc, validated_10m_indices, xmin, ymin, xmax, ymax, 1
+                    dsdesc, validated_10m_indices, xmin, ymin, xmax, ymax, 1, 1
                 )
                 with rasterio.open(dsdesc) as d_s:
                     pr_10m = d_s.profile
@@ -112,13 +112,7 @@ class Superresolution(DATA_UTILS):
                     dic_20m,
                 ) = self.validate(dsdesc)
                 data20 = self.data_final(
-                    dsdesc,
-                    validated_20m_indices,
-                    xmin // 2,
-                    ymin // 2,
-                    xmax // 2,
-                    ymax // 2,
-                    1 // 2,
+                    dsdesc, validated_20m_indices, xmin, ymin, xmax, ymax, 1, 2,
                 )
             if "60m" in dsdesc:
                 LOGGER.info("Selected 60m bands:")
@@ -128,13 +122,7 @@ class Superresolution(DATA_UTILS):
                     dic_60m,
                 ) = self.validate(dsdesc)
                 data60 = self.data_final(
-                    dsdesc,
-                    validated_60m_indices,
-                    xmin // 6,
-                    ymin // 6,
-                    xmax // 6,
-                    ymax // 6,
-                    1 // 6,
+                    dsdesc, validated_60m_indices, xmin, ymin, xmax, ymax, 1, 6,
                 )
 
         self.validated_descriptions_all = {**dic_10m, **dic_20m, **dic_60m}

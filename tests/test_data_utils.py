@@ -247,7 +247,7 @@ def test_data_final():
         seed=45, transform=transform, band_desc=valid_desc
     )
 
-    d_final = DATA_UTILS.data_final(test_img, valid_indices, 0, 0, 5, 5, 1)
+    d_final = DATA_UTILS.data_final(test_img, valid_indices, 0, 0, 5, 5, 1, 1)
     assert d_final.shape == (6, 6, 4)
 
 

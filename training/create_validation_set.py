@@ -11,7 +11,9 @@ def get_args():
         description="Create train validation index split file"
     )
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
-    parser.add_argument("--run_60", action="store_true", help="Generate val_index for 60m patches.")
+    parser.add_argument(
+        "--run_60", action="store_true", help="Generate val_index for 60m patches."
+    )
     args = parser.parse_args()
     return args
 

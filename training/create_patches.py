@@ -118,31 +118,19 @@ class readS2fromFile(DATA_UTILS):
                 LOGGER.info("Selected 10m bands:")
                 _, validated_10m_indices, _ = self.validate(dsdesc)
                 data10 = self.data_final(
-                    dsdesc, validated_10m_indices, xmin, ymin, xmax, ymax, 1
+                    dsdesc, validated_10m_indices, xmin, ymin, xmax, ymax, 1, 1
                 )
             if "20m" in dsdesc:
                 LOGGER.info("Selected 20m bands:")
                 _, validated_20m_indices, _ = self.validate(dsdesc)
                 data20 = self.data_final(
-                    dsdesc,
-                    validated_20m_indices,
-                    xmin // 2,
-                    ymin // 2,
-                    xmax // 2,
-                    ymax // 2,
-                    1 // 2,
+                    dsdesc, validated_20m_indices, xmin, ymin, xmax, ymax, 1, 2
                 )
             if "60m" in dsdesc:
                 LOGGER.info("Selected 60m bands:")
                 _, validated_60m_indices, _ = self.validate(dsdesc)
                 data60 = self.data_final(
-                    dsdesc,
-                    validated_60m_indices,
-                    xmin // 6,
-                    ymin // 6,
-                    xmax // 6,
-                    ymax // 6,
-                    1 // 6,
+                    dsdesc, validated_60m_indices, xmin, ymin, xmax, ymax, 1, 6
                 )
 
         return data10, data20, data60, xmin, ymin, xmax, ymax

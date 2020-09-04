@@ -231,7 +231,7 @@ class DATA_UTILS:
     # pylint: disable-msg=too-many-arguments
     @staticmethod
     def data_final(
-        data, term: List, x_mi: int, y_mi: int, x_ma: int, y_ma: int, n_res
+        data, term: List, x_mi: int, y_mi: int, x_ma: int, y_ma: int, n_res, scale
     ) -> np.ndarray:
         """
         This method takes the raster file at a specific
@@ -250,10 +250,10 @@ class DATA_UTILS:
                 d_final = np.rollaxis(
                     d_s.read(
                         window=Window(
-                            col_off=x_mi,
-                            row_off=y_mi,
-                            width=x_ma - x_mi + n_res,
-                            height=y_ma - y_mi + n_res,
+                            col_off=x_mi // scale,
+                            row_off=y_mi // scale,
+                            width=(x_ma - x_mi + n_res) // scale,
+                            height=(y_ma - y_mi + n_res) // scale,
                         )
                     ),
                     0,
