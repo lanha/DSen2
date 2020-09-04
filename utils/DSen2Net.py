@@ -1,23 +1,29 @@
 from __future__ import division
+import keras
 from keras.models import Model, Input
-from keras.layers import Conv2D, Conv2DTranspose, Concatenate, Activation, Lambda, Add
+from keras.layers import (
+    Conv2D,
+    Conv2DTranspose,
+    Concatenate,
+    Activation,
+    Lambda,
+    Add,
+    BatchNormalization,
+    PReLU,
+    ReLU,
+    UpSampling2D,
+)
+
+keras.backend.set_image_data_format("channels_first")
 
 
 def resBlock(x, channels, kernel_size, scale=0.1):
     tmp = Conv2D(
-        channels,
-        kernel_size,
-        data_format="channels_first",
-        kernel_initializer="he_uniform",
-        padding="same",
+        channels, kernel_size, kernel_initializer="he_uniform", padding="same",
     )(x)
     tmp = Activation("relu")(tmp)
     tmp = Conv2D(
-        channels,
-        kernel_size,
-        data_format="channels_first",
-        kernel_initializer="he_uniform",
-        padding="same",
+        channels, kernel_size, kernel_initializer="he_uniform", padding="same",
     )(tmp)
     tmp = Lambda(lambda x: x * scale)(tmp)
 
@@ -42,32 +48,156 @@ def init(input_shape):
 def aesrmodel(input_shape, n1=64):
     x, _input, channels = init(input_shape)
 
-    level1_1 = Conv2D(
-        n1, (3, 3), data_format="channels_first", activation="relu", padding="same"
-    )(x)
-    level2_1 = Conv2D(
-        n1, (3, 3), data_format="channels_first", activation="relu", padding="same"
-    )(level1_1)
+    level1_1 = Conv2D(n1, (3, 3), activation="relu", padding="same")(x)
+    level2_1 = Conv2D(n1, (3, 3), activation="relu", padding="same")(level1_1)
 
-    level2_2 = Conv2DTranspose(
-        n1, (3, 3), data_format="channels_first", activation="relu", padding="same"
-    )(level2_1)
+    level2_2 = Conv2DTranspose(n1, (3, 3), activation="relu", padding="same")(level2_1)
     level2 = Add()([level2_1, level2_2])
 
-    level1_2 = Conv2DTranspose(
-        n1, (3, 3), data_format="channels_first", activation="relu", padding="same"
-    )(level2)
+    level1_2 = Conv2DTranspose(n1, (3, 3), activation="relu", padding="same")(level2)
     level1 = Add()([level1_1, level1_2])
 
-    decoded = Conv2D(
-        channels,
-        (5, 5),
-        data_format="channels_first",
-        activation="linear",
-        padding="same",
-    )(level1)
+    decoded = Conv2D(channels, (5, 5), activation="linear", padding="same",)(level1)
 
     model = Model(inputs=_input, outputs=decoded)
+    return model
+
+
+def srcnn(input_shape):
+    f1 = 9
+    f2 = 1
+    f3 = 5
+
+    n1 = 64
+    n2 = 32
+    x, _input, channels = init(input_shape)
+
+    x = Conv2D(n1, (f1, f1), activation="relu", padding="same", name="level1")(x)
+    x = Conv2D(n2, (f2, f2), activation="relu", padding="same", name="level2")(x)
+
+    out = Conv2D(channels, (f3, f3), padding="same", name="output")(x)
+
+    model = Model(inputs=_input, outputs=out)
+    return model
+
+
+def rednetsr(input_shape):
+    def _build_layer_list(model):
+        model_layers = [layer for layer in model.layers]
+        model_outputs = [layer.output for layer in model.layers]
+        return model_layers, model_outputs
+
+    n_conv_layers = 15
+    n_deconv_layers = 15
+    n_skip = 2
+    n = 32
+
+    x, _input, channels = init(input_shape)
+
+    for i in range(n_conv_layers):
+        conv_idx = i + 1
+        if conv_idx == 1:
+            conv = Conv2D(n, (3, 3), activation="relu", padding="same")(x)
+        else:
+            conv = Conv2D(n, (3, 3), activation="relu", padding="same")(conv)
+
+    encoded = conv
+    encoder = Model(inputs=_input, outputs=encoded, name="encoder")
+    # Create encoder layer and output lists
+    encoder_layers, encoder_outputs = _build_layer_list(encoder)
+
+    # CREATE AUTOENCODER MODEL
+    for i, skip in enumerate(reversed(encoder_outputs[len(_input) + 1 :])):
+
+        deconv_idx = i + 1
+        deconv_filters = n
+        if deconv_idx == n_deconv_layers:
+            deconv_filters = channels
+
+        if deconv_idx == 1:
+            deconv = Conv2DTranspose(
+                deconv_filters, (3, 3), activation="relu", padding="same"
+            )(encoded)
+        else:
+            deconv = Conv2DTranspose(
+                deconv_filters, (3, 3), activation="relu", padding="same"
+            )(deconv)
+
+        if deconv_idx % n_skip == 0:
+            deconv = Add()([deconv, skip])
+            ReLU()(deconv)
+
+    decoded = deconv  # (decoder_inputs)
+    model = Model(inputs=_input, outputs=decoded)
+    return model
+
+
+def resnetsr(input_shape):
+    def _residual_block(ip, id):
+        channel_axis = 1  # channels first
+        init = ip
+
+        x = Conv2D(n, (3, 3), padding="same", name="sr_res_conv_" + str(id) + "_1")(ip)
+        x = BatchNormalization(
+            momentum=0.5, axis=channel_axis, name="sr_res_batchnorm_" + str(id) + "_1"
+        )(x)
+        x = PReLU(
+            alpha_initializer="zeros",
+            alpha_regularizer=None,
+            alpha_constraint=None,
+            shared_axes=[2, 3],
+        )(x)
+        x = Conv2D(n, (3, 3), padding="same", name="sr_res_conv_" + str(id) + "_2")(x)
+        x = BatchNormalization(
+            momentum=0.5, axis=channel_axis, name="sr_res_batchnorm_" + str(id) + "_2"
+        )(x)
+
+        m = Add(name="sr_res_merge_" + str(id))([x, init])
+        return m
+
+    """
+    Remove upsampling block to allow for pansharpening
+    def _upscale_block(ip, id, n, scale_factor=2):
+        init = ip
+
+        x = UpSampling2D(size=(scale_factor, scale_factor))(init)
+        x = Conv2D(
+            n, (3, 3), activation="relu", padding="same", name="sr_res_filter1_%d" % id
+        )(x)
+        return x
+    """
+
+    n = 64
+    x, _input, channels = init(input_shape)
+    if channels == 6:
+        scale_factor = 2
+    elif channels == 2:
+        scale_factor = 6
+
+    x0 = Conv2D(n, (9, 9), padding="same", name="sr_res_conv1")(x)
+    x0 = PReLU(
+        alpha_initializer="zeros",
+        alpha_regularizer=None,
+        alpha_constraint=None,
+        shared_axes=[2, 3],
+    )(x0)
+    x = x0
+
+    nb_residual = 16
+    for i in range(nb_residual):
+        x0 = _residual_block(x0, i + 1)
+
+    x0 = Conv2D(filters=n, kernel_size=3, strides=1, padding="same")(x0)
+    x0 = BatchNormalization(axis=1, momentum=0.5)(x0)
+    x0 = Add()([x, x0])
+
+    # for i in range(2):
+    #    x0 = _upscale_block(x0, i, n, scale_factor)
+
+    x0 = Conv2D(channels, (9, 9), padding="same", name="sr_res_conv_final")(x0)
+    x0 = Activation("tanh")(x0)
+    model = Model(inputs=_input, outputs=x0)
+
     return model
 
 
@@ -79,7 +209,6 @@ def s2model(input_shape, num_layers=32, feature_size=256):
     x = Conv2D(
         feature_size,
         (3, 3),
-        data_format="channels_first",
         kernel_initializer="he_uniform",
         activation="relu",
         padding="same",
@@ -90,11 +219,7 @@ def s2model(input_shape, num_layers=32, feature_size=256):
 
     # One more convolution, and then we add the output of our first conv layer
     x = Conv2D(
-        input_shape[-1][0],
-        (3, 3),
-        data_format="channels_first",
-        kernel_initializer="he_uniform",
-        padding="same",
+        input_shape[-1][0], (3, 3), kernel_initializer="he_uniform", padding="same",
     )(x)
     if len(input_shape) == 3:
         x = Add()([x, _input[2]])
