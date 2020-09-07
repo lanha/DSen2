@@ -144,6 +144,9 @@ if __name__ == "__main__":
         choices=["vdsen2", "aesr", "srcnn", "rednet", "resnet"],
         help="Model architecture to use.",
     )
+    parser.add_argument(
+        "--epochs", default=8 * 1024, type=int, help="Number of epochs to train with."
+    )
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
     args = parser.parse_args()
 
@@ -282,7 +285,7 @@ if __name__ == "__main__":
         x=train,
         y=label,
         batch_size=batch_size,
-        epochs=8 * 1024,
+        epochs=args.epochs,
         verbose=1,
         callbacks=callbacks_list,
         validation_split=0.0,
