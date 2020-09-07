@@ -431,6 +431,7 @@ def OpenDataFiles(
     # Create list from path
     fileList = [os.path.basename(x) for x in sorted(glob.glob(train_path + "*SAFE"))]
     for i, dset in enumerate(fileList):
+        print(f"Loading {dset}...")
         if i == 0:
             data10 = np.load(train_path + dset + "/data10.npy")
             data20 = np.load(train_path + dset + "/data20.npy")
@@ -457,6 +458,8 @@ def OpenDataFiles(
                 data20_gt_new = np.load(train_path + dset + "/data20_gt.npy")
                 data20_gt = np.concatenate((data20_gt, data20_gt_new))
 
+        print(f"Loaded!")
+        
     if SCALE:
         data10 /= SCALE
         data20 /= SCALE
