@@ -20,7 +20,7 @@ import keras.backend as K
 
 sys.path.append("../")
 from utils.patches import recompose_images, OpenDataFilesTest, OpenDataFiles
-from utils.DSen2Net import s2model, aesrmodel
+from utils.DSen2Net import s2model, aesrmodel, srcnn, rednetsr, resnetsr
 
 # Define file prefix for new training, must be 7 characters of this form:
 model_nr = "s2_038_"
@@ -138,9 +138,11 @@ if __name__ == "__main__":
         action="store_true",
         help="Whether to run a 60->10m network. Default 20->10m.",
     )
-    parser.add_argument("--deep", action="store_true", help=".")
     parser.add_argument(
-        "--aesr", action="store_true", help="Use AutoEnconder SR network"
+        "--model",
+        default="dsen2",
+        choices=["vdsen2", "aesr", "srcnn", "rednet", "resnet"],
+        help="Model architecture to use.",
     )
     parser.add_argument("--path", help="Path of data. Only relevant if set.")
     args = parser.parse_args()
@@ -155,16 +157,33 @@ if __name__ == "__main__":
         else:
             input_shape = ((4, None, None), (6, None, None))  # type: ignore
         # create model
-        if args.aesr:
+        print(
+            "================================================================"
+            f"Using {args.model}"
+            "================================================================"
+        )
+        if args.model == "dsen2":
+            model = s2model(input_shape, num_layers=6, feature_size=128)
+            batch_size = 128
+        elif args.model == "vdsen2":
+            model = s2model(input_shape, num_layers=32, feature_size=256)
+            batch_size = 8
+        elif args.model == "aesr":
             model = aesrmodel(input_shape)
             batch_size = 128
+        elif args.model == "srcnn":
+            model = srcnn(input_shape)
+            batch_size = 128
+        elif args.model == "rednet":
+            model = rednetsr(input_shape)
+            batch_size = 128
+        elif args.model == "resnet":
+            model = resnetsr(input_shape)
+            batch_size = 128
+
         else:
-            if args.deep:
-                model = s2model(input_shape, num_layers=32, feature_size=256)
-                batch_size = 8
-            else:
-                model = s2model(input_shape, num_layers=6, feature_size=128)
-                batch_size = 128
+            print("No model selected!!")
+
         print("Symbolic Model Created.")
 
         nadam = Nadam(
