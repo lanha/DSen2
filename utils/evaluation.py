@@ -11,9 +11,9 @@ import skimage.transform
 
 # For usage of eval in evaluation
 # pylint: disable=unused-import
+import image_similarity_measures
 from image_similarity_measures.quality_metrics import (
     psnr,
-    uiq,
     sam,
     sre,
     ssim,
@@ -29,17 +29,17 @@ logger = get_logger(__name__)
 SCALE = 2000
 MODEL_PATH = "../models/"
 
+def uiq(org_img: np.ndarray, pred_img: np.ndarray, win_size=1024, step=1024//2):
+    """
+    Universal Image Quality index
+    """
+    return image_similarity_measures.quality_metrics.uiq(org_img, pred_img, step_size=step, window_size=win_size)
 
 def rmse(org_img: np.ndarray, pred_img: np.ndarray):
     """
     Root Mean Squared Error
     """
-    rmse_final = []
-    for i in range(org_img.shape[2]):
-        m = np.mean(((org_img[:, :, i] - pred_img[:, :, i])) ** 2)
-        s = np.sqrt(m)
-        rmse_final.append(s)
-    return np.mean(rmse_final)
+    return image_similarity_measures.quality_metrics.rmse(org_img, pred_img, max_p=1)
 
 
 def write_final_dict(metric, metric_dict):
