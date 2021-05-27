@@ -478,7 +478,7 @@ def OpenDataFiles(
 def OpenDataFilesTest(
     path: str, run_60: bool, SCALE: int, true_scale: bool = False
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """From path with patches, return numpy array with patcches used for inference."""
+    """From path with patches, return numpy array with patches used for inference."""
     if not SCALE:
         SCALE = 1
 
@@ -505,7 +505,7 @@ def OpenDataFilesTest(
 
 
 def downPixelAggr(img: np.ndarray, SCALE: int = 2) -> np.ndarray:
-    """Down-scale array by scale factor. Applu gaussian blur and block reduce. """
+    """Down-scale array by scale factor. Apply gaussian blur and block reduce. """
     if len(img.shape) == 2:
         img = np.expand_dims(img, axis=-1)
     img_blur = np.zeros(img.shape)

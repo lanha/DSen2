@@ -16,6 +16,21 @@ keras.backend.set_image_data_format("channels_first")
 
 
 def resBlock(x, channels, kernel_size, scale=0.1):
+    """
+    A residual block v = ResBlock(z, f ) is defined as a series of layers that operate on
+    an input image z to generate an output z4, then adds that output to the input image as follows:
+    z1 = conv(z, f ) #convolution (5a)
+    z2 = max(z1, 0) #ReLU layer (5b)
+    z3 = conv(z2, f ) #convolution (5c)
+    z4 = lamda*z3 #residual scaling (5d)
+    v = z4 + z #skip connection
+
+    Conv2D: 2D convolution layer
+    Activation function: A function that is added into an artificial neural network in order
+    to help the network learn complex patterns in the data.
+    Add function: Simply adding two layers
+
+    """
     tmp = Conv2D(
         channels, kernel_size, kernel_initializer="he_uniform", padding="same",
     )(x)
@@ -29,6 +44,9 @@ def resBlock(x, channels, kernel_size, scale=0.1):
 
 
 def init(input_shape):
+    """
+    Input function: is used to instantiate a Keras tensor.
+    """
     input10 = Input(shape=input_shape[0])
     input20 = Input(shape=input_shape[1])
     res = [input10, input20]
@@ -170,6 +188,9 @@ def resnetsr(input_shape):
 
 
 def s2model(input_shape, num_layers=32, feature_size=256):
+    """
+    This function contains the model architecture which contains a resBlock and 2 extra Conv2D layer.
+    """
 
     x, _input, _ = init(input_shape)
 

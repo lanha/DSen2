@@ -328,6 +328,12 @@ if __name__ == "__main__":
             " or the S2A[...].xml file in a SAFE directory extracted from that ZIP."
         ),
     )
+    parser.add_argument(
+        "clip_to_aoi",
+        help=(
+            "The original image will be clipped to the given area. ex: '12.211,52.291,12.513,52.521'"
+        ),
+    )
     parser = parser_common(parser)
 
     args = parser.parse_args()
