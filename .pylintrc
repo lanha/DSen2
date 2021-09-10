@@ -1,0 +1,10 @@
+[LOGGING]
+
+# Format style used to check logging format string. `old` means using %
+# formatting, while `new` is for `{}` formatting.
+#logging-format-style=fstr
+
+[MESSAGE CONTROL]
+disable=
+    logging-fstring-interpolation,
+    logging-format-interpolation
