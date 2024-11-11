@@ -22,9 +22,14 @@ def DSen2_20(d10, d20, deep=False):
     p10, p20 = get_test_patches(d10, d20, patchSize=128, border=border)
     p10 /= SCALE
     p20 /= SCALE
+    # Using NHWC format to support CPU runs
+    p10 = p10.transpose(0, 2, 3, 1)
+    p20 = p20.transpose(0, 2, 3, 1)
     test = [p10, p20]
-    input_shape = ((4, None, None), (6, None, None))
+    input_shape = ((None, None, 4), (None, None, 6))
     prediction = _predict(test, input_shape, deep=deep)
+    prediction = prediction.transpose(0, 3, 1, 2)
+    # Reverting back to CHW format for compatibility with existing functions
     images = recompose_images(prediction, border=border, size=d10.shape)
     images *= SCALE
     return images
@@ -42,9 +47,15 @@ def DSen2_60(d10, d20, d60, deep=False):
     p10 /= SCALE
     p20 /= SCALE
     p60 /= SCALE
+    # Using NHWC format to support CPU runs
+    p10 = p10.transpose(0, 2, 3, 1)
+    p20 = p20.transpose(0, 2, 3, 1)
+    p60 = p60.transpose(0, 2, 3, 1)
     test = [p10, p20, p60]
-    input_shape = ((4, None, None), (6, None, None), (2, None, None))
+    input_shape = ((None, None, 4), (None, None, 6), (None, None, 2))
     prediction = _predict(test, input_shape, deep=deep, run_60=True)
+    # Reverting back to CHW format for compatibility with existing functions
+    prediction = prediction.transpose(0, 3, 1, 2)
     images = recompose_images(prediction, border=border, size=d10.shape)
     images *= SCALE
     return images
