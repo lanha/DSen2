@@ -1,15 +1,17 @@
 from __future__ import division
+
 # import numpy as np
 # import argparse
 # from skimage.transform import resize
 import sys
-sys.path.append('../')
+
+sys.path.append("../")
 from utils.DSen2Net import s2model
 from utils.patches import get_test_patches, get_test_patches60, recompose_images
 
 
 SCALE = 2000
-MDL_PATH = '../models/'
+MDL_PATH = "../models/"
 
 
 def DSen2_20(d10, d20, deep=False):
@@ -65,14 +67,21 @@ def _predict(test, input_shape, deep=False, run_60=False):
     # create model
     if deep:
         model = s2model(input_shape, num_layers=32, feature_size=256)
-        predict_file = MDL_PATH+'s2_034_lr_1e-04.hdf5' if run_60 else MDL_PATH+'s2_033_lr_1e-04.hdf5'
+        predict_file = (
+            MDL_PATH + "s2_034_lr_1e-04.hdf5"
+            if run_60
+            else MDL_PATH + "s2_033_lr_1e-04.hdf5"
+        )
     else:
         model = s2model(input_shape, num_layers=6, feature_size=128)
-        predict_file = MDL_PATH+'s2_030_lr_1e-05.hdf5' if run_60 else MDL_PATH+'s2_032_lr_1e-04.hdf5'
-    print('Symbolic Model Created.')
+        predict_file = (
+            MDL_PATH + "s2_030_lr_1e-05.hdf5"
+            if run_60
+            else MDL_PATH + "s2_032_lr_1e-04.hdf5"
+        )
+    print("Symbolic Model Created.")
 
     model.load_weights(predict_file)
     print("Predicting using file: {}".format(predict_file))
     prediction = model.predict(test, verbose=1)
     return prediction
-
