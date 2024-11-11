@@ -7,8 +7,8 @@ import numpy as np
 # This file must be changed if the DSen2_60 net is trained! (change the `path` and size of patches)
 
 # Size: number of S2 tiles (times) patches per tile
-size = 45*8000
-ratio = .1
+size = 45 * 8000
+ratio = 0.1
 nb = int(size * ratio)
 
 index = np.zeros(size).astype(np.bool)
@@ -18,10 +18,10 @@ while np.sum(index.astype(np.int)) < nb:
     index[x] = True
     i += 1
 
-path = '../data/train/'
-np.save(path + 'val_index.npy', index)
+path = "../data/train/"
+np.save(path + "val_index.npy", index)
 
-print('Full no of samples: {}'.format(size))
-print('Validation samples: {}'.format(np.sum(index.astype(np.int))))
+print("Full no of samples: {}".format(size))
+print("Validation samples: {}".format(np.sum(index.astype(np.int))))
 
 print("Number of iterations: {}".format(i))
